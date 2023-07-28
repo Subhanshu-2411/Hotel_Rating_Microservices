@@ -2,6 +2,7 @@ package com.example.user_service.service;
 
 import com.example.user_service.models.User;
 import com.example.user_service.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,11 +10,9 @@ import java.util.List;
 @Service
 public class UserServiceImplementation implements UserService{
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public UserServiceImplementation(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public List<User> getUsers() {

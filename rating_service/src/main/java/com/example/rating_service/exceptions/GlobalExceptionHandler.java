@@ -1,6 +1,6 @@
 package com.example.rating_service.exceptions;
 
-import com.example.user_service.payload.APIResponse;
+import com.example.rating_service.payload.APIResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

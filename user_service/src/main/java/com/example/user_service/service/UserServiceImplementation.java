@@ -2,6 +2,7 @@ package com.example.user_service.service;
 
 import com.example.user_service.exceptions.ResourceNotFoundException;
 import com.example.user_service.external.service.HotelService;
+import com.example.user_service.external.service.RatingService;
 import com.example.user_service.models.Hotel;
 import com.example.user_service.models.Rating;
 import com.example.user_service.models.User;
@@ -28,28 +29,27 @@ public class UserServiceImplementation implements UserService{
     @Autowired
     private HotelService hotelService;
 
+    @Autowired
+    private RatingService ratingService;
+
 
     @Override
     public List<User> getUsers() {
-        List<User> users = userRepository.findAll();
-        for(User user: users) {
-            user.setRatings(restTemplate.getForObject("http://localhost:8003/rating/user/" + user.getUserId(), ArrayList.class));
-        }
-        return users;
+        return userRepository.findAll().stream()
+                .peek(user -> user.setRatings((ratingService.getUserRatings(user.getUserId()).getBody().stream()
+                        .peek(rating -> rating.setHotel(hotelService.getHotel(rating.getHotelId()).getBody()))
+                        .collect(Collectors.toList()))
+                ))
+                .collect(Collectors.toList());
     }
 
     @Override
     public User getUser(String userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource Not Found: " + userId));
-//        user.setRatings(restTemplate.getForObject("http://localhost:8003/rating/user/" + user.getUserId(), ArrayList.class).stream().map(rating -> {
-//            rating.setHotel(restTemplate.getForObject("http://localhost:8002/hotel/get/" + rating.getHotelId(), Hotel.class));
-//        }).collect(Collectors.toList()));
-        ArrayList<Rating> ratings = restTemplate.getForObject("http://RATING-SERVICE/rating/user/" + user.getUserId(), ArrayList.class);
-        ratings.stream().map(rating -> {
-            rating.setHotel(hotelService.getHotel(rating.getHotelId()).getBody());
-            return rating;
-        });
-        user.setRatings(ratings);
+        user.setRatings(ratingService.getUserRatings(user.getUserId()).getBody().stream()
+                .peek(rating -> rating.setHotel(hotelService.getHotel(rating.getHotelId()).getBody()))
+                .collect(Collectors.toList()));
+
         return user;
     }
 

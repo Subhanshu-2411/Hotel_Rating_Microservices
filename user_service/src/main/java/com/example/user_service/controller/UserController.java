@@ -2,11 +2,13 @@ package com.example.user_service.controller;
 
 import com.example.user_service.models.User;
 import com.example.user_service.service.UserService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -17,13 +19,23 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/get")
+    @CircuitBreaker(name = "AllUserRating", fallbackMethod = "AllUserRating")
     public ResponseEntity<List<User>> getUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUsers());
     }
 
+    public ResponseEntity<List<User>> AllUserRating() {
+        return ResponseEntity.status(HttpStatus.OK).body(new ArrayList<>());
+    }
+
     @GetMapping("/get/{userId}")
+    @CircuitBreaker(name = "UserRating", fallbackMethod = "UserRating")
     public ResponseEntity<User> getUser(@PathVariable("userId") String userId) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUser(userId));
+    }
+
+    public ResponseEntity<User> UserRating() {
+        return ResponseEntity.status(HttpStatus.OK).body(new User());
     }
 
     @PostMapping("/save")

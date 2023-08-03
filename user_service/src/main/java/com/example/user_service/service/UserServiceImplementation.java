@@ -7,6 +7,7 @@ import com.example.user_service.models.Hotel;
 import com.example.user_service.models.Rating;
 import com.example.user_service.models.User;
 import com.example.user_service.repository.UserRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.eureka.http.RestTemplateEurekaHttpClient;
 import org.springframework.stereotype.Service;
